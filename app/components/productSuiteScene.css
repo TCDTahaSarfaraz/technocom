@@ -1,0 +1,219 @@
+/*
+================================================================================
+  ProductSuiteScene.css
+  Updated: Clean, professional, animated product suite with perfect SVG paths.
+  - No lines crossing boxes or labels
+  - Stronger glow, better dark mode
+  - Smooth path animation
+  - Fully responsive
+================================================================================
+*/
+
+/* --- 1. SHARED & MOBILE-FIRST DEFAULTS --- */
+
+.animation-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+/* Mobile grid */
+.product-grid-mobile {
+  width: 100%;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .product-grid-mobile {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.product-block-mobile {
+  background-color: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px -2px rgba(0,0,0,0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  visibility: hidden;
+}
+.dark .product-block-mobile {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+.product-block-mobile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+}
+
+.icon-container-mobile {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background-color: color-mix(in srgb, var(--product-color) 15%, transparent);
+  color: var(--product-color);
+}
+.icon-container-mobile svg {
+  width: 24px;
+  height: 24px;
+}
+
+.product-label-mobile {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  color: #334155;
+}
+.dark .product-label-mobile {
+  color: #e2e8f0;
+}
+
+/* --- 2. DESKTOP-ONLY STYLES (LG Breakpoint) --- */
+@media (min-width: 1024px) {
+
+  /* -- 2A. Main Animation Stage -- */
+  .animation-stage {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;           /* Slightly wider for breathing room */
+    height: 650px;               /* Taller to fit all nodes cleanly */
+    margin-inline: auto;
+    user-select: none;
+    overflow: hidden;            /* Prevents scrollbars from SVG overflow */
+  }
+
+  /* Node positions – fine-tuned to avoid overlap & support clean paths */
+  #billing    { top: 12%; left: 14%; }
+  #invoicing  { top: 12%; left: 40%; }
+  #tax        { top: 12%; left: 66%; }
+
+  #connect    { top: 32%; left: 14%; }
+  #issuing    { top: 32%; left: 40%; }
+  #payments   { top: 32%; left: 66%; }
+
+  #capital    { top: 54%; left: 14%; }
+  #terminal   { top: 54%; left: 40%; }
+  #radar      { top: 54%; left: 66%; }
+
+  #treasury   { top: 76%; left: 40%; }
+
+  /* -- 2B. Product Node Styling -- */
+  .product-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90px;                 /* Slightly wider for breathing room */
+    visibility: hidden;
+    z-index: 20;                 /* Above SVG paths */
+  }
+
+  .product-box {
+    width: 72px;
+    height: 72px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 2px solid #eef2ff;
+    box-shadow: 0 6px 16px -6px rgba(0,0,0,0.08);
+    color: #cbd5e1;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .dark .product-box {
+    background-color: #020617;
+    border-color: #1e293b;
+    color: #475569;
+  }
+
+  .product-label {
+    margin-top: 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+  .dark .product-label {
+    color: #94a3b8;
+  }
+
+  .icon-container { 
+    width: 28px; 
+    height: 28px; 
+  }
+  .icon-container svg * {
+    fill: none;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+  }
+  .fill-icon .icon-container svg * {
+    stroke: none;
+    fill: currentColor;
+  }
+
+  /* -- 2C. Glowing State (Stronger & Premium) -- */
+  .product-node.is-glowing .product-box {
+    border-color: var(--product-color);
+    color: var(--product-color);
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 0 5px color-mix(in srgb, var(--product-color) 28%, transparent),
+      0 0 0 10px color-mix(in srgb, var(--product-color) 15%, transparent),
+      0 12px 30px -8px color-mix(in srgb, var(--product-color) 35%, transparent);
+  }
+
+  .product-node.is-glowing .product-label {
+    color: #1e293b;
+    font-weight: 700;
+  }
+  .dark .product-node.is-glowing .product-label {
+    color: #f1f5f9;
+  }
+
+  /* -- 2D. SVG Path Styling (Clean, Bold, Animated) -- */
+  .svg-path-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 10;                 /* Below nodes (z-index 20) */
+  }
+
+  .path-line {
+    stroke-width: 3px;           /* Bolder, more professional */
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;                  /* Hidden until animated in */
+    filter: drop-shadow(0 0 6px rgba(0,0,0,0.25));
+    will-change: stroke-dashoffset, opacity;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Dark mode: glowing line effect */
+  .dark .path-line {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+
+  /* Optional: Subtle entrance fade */
+  .path-line.is-active {
+    opacity: 1;
+  }
+}
