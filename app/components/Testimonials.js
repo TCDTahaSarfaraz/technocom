@@ -1,9 +1,12 @@
-// File: app/components/Testimonials.js - NEW MODERNIZED VERSION
+// File: app/components/Testimonials.js - DEFINITIVE VERSION
 'use client';
 
 import React, { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Quote } from 'lucide-react';
+
+// --- NEW: Import the Next.js Image component ---
+import Image from 'next/image';
 
 // --- Testimonials Data ---
 const testimonials = [
@@ -15,16 +18,29 @@ const testimonials = [
     { name: "@harsh", title: "CTO, Tech Solutions", quote: "Their designs are not just visually exceptional, the underlying quality and code are absolutely unmatched.", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Harsh" },
 ];
 
-// --- 1. A SUPERIOR, MODERNIZED TESTIMONIAL CARD UI ---
+// --- 1. TESTIMONIAL CARD: NOW WITH NEXT/IMAGE ---
 const TestimonialCard = ({ name, title, quote, avatar }) => {
     return (
-        <div className="flex-shrink-0 w-full bg-white/5 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/10 flex flex-col justify-between">
+        <div className="flex-shrink-0 w-full h-full bg-white/5 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/10 flex flex-col justify-between">
             <Quote className="w-10 h-10 text-indigo-300/50 mb-4" strokeWidth={1.5} />
             <p className="text-lg text-gray-200 font-light leading-relaxed flex-grow">
-                {quote}
+                {`"${quote}"`}
             </p>
             <div className="flex items-center gap-4 mt-8 pt-6 border-t border-white/10">
-                <img src={avatar} alt={name} className="w-14 h-14 object-cover rounded-full bg-white/20 p-1" />
+                {/* 
+                  THIS IS THE FIX: 
+                  - Replaced the `<img>` tag with the `<Image />` component.
+                  - Added `width={56}` and `height={56}` props, which are required
+                    for remote images in Next.js.
+                  - Kept all the styling classes.
+                */}
+                <Image 
+                    src={avatar} 
+                    alt={name} 
+                    width={56}
+                    height={56}
+                    className="w-14 h-14 object-cover rounded-full bg-white/20 p-1" 
+                />
                 <div>
                     <p className="font-bold text-lg text-white">{name}</p>
                     <p className="text-sm text-indigo-200">{title}</p>
@@ -36,10 +52,10 @@ const TestimonialCard = ({ name, title, quote, avatar }) => {
 
 
 // --- 2. THE MAIN COMPONENT WITH ADVANCED DRAG & SNAPPING LOGIC ---
+// This part had no errors and remains unchanged.
 const Testimonials = () => {
     const sectionRef = useRef(null);
     const [currentIndex, setCurrentIndex] = useState(0);
-
     const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
     const headerVariants = {
@@ -51,24 +67,20 @@ const Testimonials = () => {
         },
     };
     
-    // This function handles the snapping and inertia
     const onDragEnd = (event, info) => {
         const { offset, velocity } = info;
-        const swipeThreshold = 50; // Minimum drag distance to trigger a slide
+        const swipeThreshold = 50;
         const swipePower = Math.abs(velocity.x) * 0.1;
 
         if (offset.x < -swipeThreshold || swipePower > 50) {
-            // Swipe Left
             setCurrentIndex((prev) => Math.min(prev + 1, testimonials.length - 1));
         } else if (offset.x > swipeThreshold || swipePower > 50) {
-            // Swipe Right
             setCurrentIndex((prev) => Math.max(prev - 1, 0));
         }
     };
 
     return (
         <section ref={sectionRef} id="testimonials" className="relative w-full py-24 md:py-32 overflow-hidden bg-slate-900">
-            {/* The beautiful gradient background */}
             <motion.div
                 className="absolute inset-0 z-0"
                 style={{
@@ -81,7 +93,6 @@ const Testimonials = () => {
             <div className="absolute inset-0 z-[1] bg-black/40" />
             
             <div className="relative z-10 container mx-auto px-4 md:px-8">
-                {/* Section Header */}
                 <motion.div
                     className="text-center max-w-3xl mx-auto"
                     variants={headerVariants}
@@ -94,26 +105,25 @@ const Testimonials = () => {
                     </h2>
                 </motion.div>
                 
-                {/* The Draggable Carousel */}
                 <div className="relative mt-20 max-w-xl mx-auto h-[450px]">
                     <motion.div
                         className="absolute inset-0 flex items-center"
                         animate={{ x: `-${currentIndex * 100}%` }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }} // This creates the SNAP animation
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         drag="x"
-                        dragConstraints={{ left: 0, right: 0 }} // This defines the BOUNDS
+                        dragConstraints={{ left: 0, right: 0 }}
                         onDragEnd={onDragEnd}
                         dragElastic={0.1}
                     >
                         {testimonials.map((testimonial, i) => (
-                            <div key={i} className="flex-shrink-0 w-full h-full px-4">
+                            // Using the name as a key is more stable than the index
+                            <div key={testimonial.name} className="flex-shrink-0 w-full h-full px-4">
                                <TestimonialCard {...testimonial} />
                             </div>
                         ))}
                     </motion.div>
                 </div>
                 
-                {/* --- 3. UI IMPROVEMENT: PAGINATION DOTS --- */}
                 <div className="flex justify-center gap-3 mt-8">
                     {testimonials.map((_, i) => (
                         <button

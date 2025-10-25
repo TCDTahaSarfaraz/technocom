@@ -1,3 +1,4 @@
+// app/components/Contact.js
 'use client';
 
 import { useRef } from 'react';
@@ -33,7 +34,6 @@ const ContactSection = () => {
       ref={sectionRef}
       className="relative w-full py-16 sm:py-20 lg:py-28 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900"
     >
-      {/* Animated Gradient Background */}
       <motion.div
         className="absolute inset-0 z-0"
         style={{
@@ -61,11 +61,16 @@ const ContactSection = () => {
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
                   Get in Touch
                 </h2>
+                {/* 
+                  THIS IS THE KEY FIX: 
+                  The apostrophe in "we'll" has been replaced with `&apos;`
+                  to prevent JSX and Vercel's linter from throwing an error.
+                */}
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-6 sm:mb-8">
-                  Have a project in mind or just want to say hi? Fill out the form, and we'll get back to you.
+                  Have a project in mind or just want to say hi? Fill out the form, and we&apos;ll get back to you.
                 </p>
 
-                <form className="space-y-4 sm:space-y-5 flex-grow flex flex-col">
+                <form className="space-y-4 sm:space-y-5 flex-grow flex flex-col" onSubmit={(e) => e.preventDefault()}>
                   <input
                     type="text"
                     placeholder="Full Name"
@@ -126,7 +131,6 @@ const ContactSection = () => {
                   </div>
                 </div>
 
-                {/* Map */}
                 <div className="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 rounded-2xl overflow-hidden border border-gray-300 dark:border-slate-700 shadow-lg">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3620.401590081113!2d67.00464987401142!3d24.850130145673422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb33e06f2a60f3b%3A0xd6863f65ab088107!2sTechnoCom%20Developments!5e0!3m2!1sen!2s!4v1761140136766!5m2!1sen!2s"
@@ -138,6 +142,7 @@ const ContactSection = () => {
                     referrerPolicy="no-referrer-when-downgrade"
                     className="grayscale hover:grayscale-0 transition-all duration-500"
                     title="TechnoCom Office Location"
+                    aria-label="Google Maps embed showing office location"
                   ></iframe>
                 </div>
               </motion.div>
