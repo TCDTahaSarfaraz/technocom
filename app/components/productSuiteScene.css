@@ -42,7 +42,7 @@
   justify-content: center;
   box-shadow: 0 4px 10px -2px rgba(0,0,0,0.04);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  visibility: hidden;
+  visibility: visible; /* Changed for sample */
 }
 .dark .product-block-mobile {
   background-color: #0f172a;

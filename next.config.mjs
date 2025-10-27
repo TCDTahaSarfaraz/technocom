@@ -1,13 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // The images configuration must be a property inside this main object
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'picsum.photos',
+        hostname: 'api.dicebear.com',
         port: '',
-        pathname: '/**',
+        pathname: '/7.x/avataaars/svg/**',
       },
     ],
   },

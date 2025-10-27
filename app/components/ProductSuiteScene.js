@@ -35,11 +35,11 @@ const allBoxesData = [
     { id: 'treasury', label: 'Treasury', color: '#06b6d4', Icon: (p) => <svg viewBox="0 0 24 24" {...p}><path d="M8 14h8M8 10h8m-4 8V6"/><path d="M3 20V4a2 2 0 012-2h14a2 2 0 012 2v16l-4-4H7l-4 4Z"/></svg> },
 ];
 
-// The definitive "Blueprint" with forced start/end sides for artistic control.
+// --- MODIFIED: Changed startSide for 'payments' from 'bottom' to 'left' ---
 const animationPairsData = [
-    { from: 'billing',  to: 'issuing',  pathType: 'custom-billing-issuing', startSide: 'right', endSide: 'right' },
+    { from: 'billing',  to: 'issuing',  pathType: 'custom-billing-issuing', startSide: 'right', endSide: 'left' },
     { from: 'invoicing',to: 'radar',    pathType: 'custom-invoicing-radar', startSide: 'right', endSide: 'right' },
-    { from: 'payments', to: 'capital',  pathType: 'custom-payments-capital', startSide: 'bottom', endSide: 'right' },
+    { from: 'payments', to: 'capital',  pathType: 'custom-payments-capital', startSide: 'left', endSide: 'right' },
     { from: 'tax',      to: 'treasury', pathType: 'custom-tax-treasury', startSide: 'right', endSide: 'top'},
     { from: 'connect',  to: 'terminal', pathType: 'custom-connect-terminal' },
 ];
@@ -47,7 +47,7 @@ const animationPairsData = [
 // --- ADVANCED PATH GENERATION HELPERS ---
 const getAttachmentPoint = (boxRect, targetCenter, sideOverride = null) => {
     const boxCenter = { x: boxRect.left + boxRect.width / 2, y: boxRect.top + boxRect.height / 2 };
-    const buffer = 10;
+    const buffer = 0; // Starts from the exact border
     
     if (sideOverride) {
         switch(sideOverride) {
@@ -65,6 +65,7 @@ const getAttachmentPoint = (boxRect, targetCenter, sideOverride = null) => {
     return { x: boxRect.x + boxRect.width / 2, y: boxRect.top - buffer };
 };
 
+// --- MODIFIED: New logic for 'custom-payments-capital' ---
 const createPath = (start, end, type, allRects, containerRect) => {
     const getRelCenter = (id) => ({
         x: (allRects[id].left + allRects[id].width / 2) - containerRect.left,
@@ -78,19 +79,29 @@ const createPath = (start, end, type, allRects, containerRect) => {
             return `M ${start.x} ${start.y} H ${waypointX} V ${waypointY} H ${end.x}`;
         }
         case 'custom-invoicing-radar': {
-            const waypointX = (getRelCenter('invoicing').x + getRelCenter('tax').x) / 2;
-            const waypointY = getRelCenter('terminal').y;
-            return `M ${start.x} ${start.y} H ${waypointX} V ${waypointY} H ${end.x}`;
+            const channelX = (getRelCenter('invoicing').x + getRelCenter('tax').x) / 2;
+            return `M ${start.x} ${start.y} H ${channelX} V ${end.y} H ${end.x}`;
         }
+
+        // --- NEW & IMPROVED PATH LOGIC ---
+        // This path navigates cleanly around other nodes.
+        // 1. Moves left from 'Payments' into the channel between the middle and right columns.
+        // 2. Moves down into the channel between the middle and bottom rows.
+        // 3. Moves left into the channel between the left and middle columns.
+        // 4. Moves down to align with 'Capital'.
+        // 5. Moves right to connect cleanly to 'Capital'.
         case 'custom-payments-capital': {
-            const waypointX = getRelCenter('issuing').x;
-            const waypointY = end.y;
-            return `M ${start.x} ${start.y} V ${waypointY} H ${waypointX} H ${end.x}`;
+            const channel_X_Right = (getRelCenter('issuing').x + getRelCenter('payments').x) / 2;
+            const channel_Y_Mid = (getRelCenter('issuing').y + getRelCenter('terminal').y) / 2;
+            const channel_X_Left = (getRelCenter('capital').x + getRelCenter('terminal').x) / 2;
+
+            return `M ${start.x} ${start.y} H ${channel_X_Right} V ${channel_Y_Mid} H ${channel_X_Left} V ${end.y} H ${end.x}`;
         }
+
         case 'custom-tax-treasury': {
-             const waypointY1 = getRelCenter('radar').y;
-             const waypointX = getRelCenter('terminal').x;
-             return `M ${start.x} ${start.y} H ${start.x + 20} V ${waypointY1} H ${waypointX} V ${end.y}`;
+             const waypointX1 = start.x + 30;
+             const waypointY1 = (getRelCenter('radar').y + getRelCenter('treasury').y) / 2;
+             return `M ${start.x} ${start.y} H ${waypointX1} V ${waypointY1} H ${end.x} V ${end.y}`;
         }
         case 'custom-connect-terminal': {
             const waypointX = (getRelCenter('connect').x + getRelCenter('issuing').x) / 2;
@@ -100,6 +111,7 @@ const createPath = (start, end, type, allRects, containerRect) => {
         default: return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
     }
 };
+
 
 // --- SUB-COMPONENTS & MAIN DESKTOP COMPONENT ---
 // This entire section is unchanged as the logic is correct and just interprets the new path data.
@@ -112,7 +124,18 @@ const ProductNode = React.forwardRef(({ id, children, Icon, color, iconType }, r
 ));
 ProductNode.displayName = 'ProductNode';
 
-const MobileGrid = () => { /* ... */ };
+const MobileGrid = () => {
+    return (
+        <div className="product-grid-mobile">
+            {allBoxesData.map(box => (
+                 <div key={box.id} className="product-block-mobile" style={{'--product-color': box.color}}>
+                     <div className="icon-container-mobile"><box.Icon/></div>
+                     <div className="product-label-mobile">{box.label}</div>
+                 </div>
+            ))}
+        </div>
+    )
+};
 
 const DesktopAnimation = () => {
     const containerRef = useRef(null);
@@ -154,7 +177,9 @@ const DesktopAnimation = () => {
         };
         const timeoutId = setTimeout(computeAndUpdatePaths, 100); 
         const ro = new ResizeObserver(computeAndUpdatePaths);
-        ro.observe(containerRef.current);
+        if (containerRef.current) {
+          ro.observe(containerRef.current);
+        }
         return () => { clearTimeout(timeoutId); ro.disconnect(); };
     }, []);
 
@@ -183,20 +208,20 @@ const DesktopAnimation = () => {
                 
                 masterTimeline
                     .add(() => {
-                        Object.values(boxRefs.current).forEach(node => node.classList.remove('is-glowing'));
-                        fromNode.classList.add('is-glowing');
+                        Object.values(boxRefs.current).forEach(node => node?.classList.remove('is-glowing'));
+                        fromNode?.classList.add('is-glowing');
                     })
                     .to(pathEl, { autoAlpha: 1, duration: 0.1 })
                     .to(pathEl, { strokeDashoffset: 0, duration: 1.2, ease: "sine.inOut" }, "<")
                     .add(() => {
-                        fromNode.classList.remove('is-glowing');
-                        toNode.classList.add('is-glowing');
+                        fromNode?.classList.remove('is-glowing');
+                        toNode?.classList.add('is-glowing');
                     }, "-=0.2")
                     .to(pathEl, { autoAlpha: 0, duration: 0.4 }, "+=0.5")
                     .set(pathEl, { strokeDashoffset: pathEl.getTotalLength() }); 
             });
             
-            masterTimeline.add(() => Object.values(boxRefs.current).forEach(node => node.classList.remove('is-glowing')));
+            masterTimeline.add(() => Object.values(boxRefs.current).forEach(node => node?.classList.remove('is-glowing')));
             
             ScrollTrigger.create({ trigger: containerRef.current, start: "top 50%", onEnter: () => masterTimeline.play(), onLeaveBack: () => masterTimeline.pause(0) });
         }, containerRef);

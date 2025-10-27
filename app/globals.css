@@ -1,14 +1,25 @@
-/* File: app/globals.css */
+/*
+================================================================================
+  globals.css
+  This file contains the foundational styles for the entire application.
+  - Tailwind CSS setup
+  - CSS variables for theming (Shadcn/UI compatible)
+  - Global body styling (including background)
+  - Custom animations
+================================================================================
+*/
 
+/* 1. Tailwind Directives: Must be at the very top of the file. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* 
-  This is the foundation for your theme. It defines the colors your
-  tailwind.config.js is trying to use.
+  2. Base Layer & CSS Variables
+  This single @layer block contains all your global styles and theme variables.
 */
 @layer base {
+  /* -- Light Mode Color Palette (Shadcn/UI) -- */
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -41,6 +52,7 @@
     --radius: 0.75rem;
   }
 
+  /* -- Dark Mode Color Palette (Shadcn/UI) -- */
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -70,14 +82,50 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
-  .theme {
-    --animate-first: moveVertical 30s ease infinite;
-    --animate-second: moveInCircle 20s reverse infinite;
-    --animate-third: moveInCircle 40s linear infinite;
-    --animate-fourth: moveHorizontal 40s ease infinite;
-    --animate-fifth: moveInCircle 20s ease infinite;
+
+  /* -- Global Element Styles -- */
+  * {
+    /* Apply the theme's border color to all elements */
+    @apply border-border;
+  }
+  
+  html,
+  body {
+    scroll-behavior: smooth;
+    color-scheme: dark light;
+  }
+
+  body {
+    /* Apply the theme's background and foreground colors */
+    @apply bg-background text-foreground;
+    
+    /* Font smoothing for a professional look */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /*
+      Layered background effect for both light and dark themes.
+      This includes a subtle grid pattern using an optimized SVG.
+    */
+    background-image:
+      linear-gradient(white, #f8fafc),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cg fill='%23e2e8f0'%3E%3Cpolygon points='20 0 20 20 0 20'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 100%, 10px 10px;
+  }
+
+  .dark body {
+    background-image:
+      linear-gradient(rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.96)),
+      radial-gradient(ellipse at top, #1e3a8a30, transparent),
+      radial-gradient(ellipse at bottom, #4c1d9530, transparent),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cg fill='%231e293b'%3E%3Cpolygon points='20 0 20 20 0 20'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 100%, 100%, 100%, 10px 10px;
   }
 }
+
+/* 3. Custom Animations */
+
+/* Simple glow effect */
 @keyframes glow {
   0%, 100% {
     opacity: 0.2;
@@ -91,16 +139,27 @@
 .animate-glow {
   animation: glow 4s ease-in-out infinite alternate;
 }
-@keyframes scroll-y {
-  from { transform: translateY(0); }
-  to { transform: translateY(-50%); }
+
+/* Background gradient movement animations */
+@keyframes moveHorizontal {
+  0% { transform: translateX(-50%) translateY(-10%); }
+  50% { transform: translateX(50%) translateY(10%); }
+  100% { transform: translateX(-50%) translateY(-10%); }
 }
 
-@keyframes scroll-y-reverse {
-  from { transform: translateY(-50%); }
-  to { transform: translateY(0); }
+@keyframes moveInCircle {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
 }
 
+@keyframes moveVertical {
+  0% { transform: translateY(-50%); }
+  50% { transform: translateY(50%); }
+  100% { transform: translateY(-50%); }
+}
+
+/* Other custom animations (if needed) */
 @keyframes anim-star {
   from {
     transform: translateY(0px) scale(1);
@@ -110,173 +169,4 @@
     transform: translateY(-200px) scale(1.5);
     opacity: 0;
   }
-}
-
-.animate-scroll-y {
-  animation: scroll-y linear infinite;
-}
-
-.animate-scroll-y-reverse {
-  animation: scroll-y-reverse linear infinite;
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-@theme inline {
-  @keyframes moveHorizontal {
-  0% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  50% {
-    transform: translateX(50%) translateY(10%);
-    }
-  100% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  }
-  @keyframes moveInCircle {
-  0% {
-    transform: rotate(0deg);
-    }
-  50% {
-    transform: rotate(180deg);
-    }
-  100% {
-    transform: rotate(360deg);
-    }
-  }
-  @keyframes moveVertical {
-  0% {
-    transform: translateY(-50%);
-    }
-  50% {
-    transform: translateY(50%);
-    }
-  100% {
-    transform: translateY(-50%);
-    }
-  }
-  @keyframes moveHorizontal {
-  0% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  50% {
-    transform: translateX(50%) translateY(10%);
-    }
-  100% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  }
-  @keyframes moveInCircle {
-  0% {
-    transform: rotate(0deg);
-    }
-  50% {
-    transform: rotate(180deg);
-    }
-  100% {
-    transform: rotate(360deg);
-    }
-  }
-  @keyframes moveVertical {
-  0% {
-    transform: translateY(-50%);
-    }
-  50% {
-    transform: translateY(50%);
-    }
-  100% {
-    transform: translateY(-50%);
-    }
-  }
-  @keyframes moveHorizontal {
-  0% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  50% {
-    transform: translateX(50%) translateY(10%);
-    }
-  100% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  }
-  @keyframes moveInCircle {
-  0% {
-    transform: rotate(0deg);
-    }
-  50% {
-    transform: rotate(180deg);
-    }
-  100% {
-    transform: rotate(360deg);
-    }
-  }
-  @keyframes moveVertical {
-  0% {
-    transform: translateY(-50%);
-    }
-  50% {
-    transform: translateY(50%);
-    }
-  100% {
-    transform: translateY(-50%);
-    }
-  }
-  @keyframes moveHorizontal {
-  0% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  50% {
-    transform: translateX(50%) translateY(10%);
-    }
-  100% {
-    transform: translateX(-50%) translateY(-10%);
-    }
-  }
-  @keyframes moveInCircle {
-  0% {
-    transform: rotate(0deg);
-    }
-  50% {
-    transform: rotate(180deg);
-    }
-  100% {
-    transform: rotate(360deg);
-    }
-  }
-  @keyframes moveVertical {
-  0% {
-    transform: translateY(-50%);
-    }
-  50% {
-    transform: translateY(50%);
-    }
-  100% {
-    transform: translateY(-50%);
-    }
-  }
-}
-.orbit-pill {
-  position: absolute; /* GSAP will control top/left */
-  z-index: 10;
-  will-change: transform; /* Performance optimization */
-}
-
-.pill-label {
-  display: block;
-  padding: 6px 16px;
-  background-color: #4338ca; /* Indigo-700 */
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 9999px;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
